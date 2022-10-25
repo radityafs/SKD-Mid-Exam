@@ -7,16 +7,21 @@ namespace Composer\Autoload;
 class ComposerStaticInit1b241150b92787e668eb42e6bd013ae2
 {
     public static $prefixLengthsPsr4 = array (
-        'P' => 
+        'M' => 
         array (
-            'PhpAes\\' => 7,
+            'MiladRahimi\\PhpCrypt\\Tests\\' => 27,
+            'MiladRahimi\\PhpCrypt\\' => 21,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'PhpAes\\' => 
+        'MiladRahimi\\PhpCrypt\\Tests\\' => 
         array (
-            0 => __DIR__ . '/..' . '/phpaes/phpaes/src',
+            0 => __DIR__ . '/..' . '/miladrahimi/phpcrypt/tests',
+        ),
+        'MiladRahimi\\PhpCrypt\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/miladrahimi/phpcrypt/src',
         ),
     );
 

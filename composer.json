@@ -2,7 +2,7 @@
     "name": "skd/uts_algorithm",
     "type": "project",
     "require": {
-        "phpaes/phpaes": "^3.1"
+        "miladrahimi/phpcrypt": "5.*"
     },
     "authors": [
         {

@@ -1,60 +1,62 @@
 <?php
 
 require 'vendor/autoload.php';
-use PhpAes\Aes;
+
+use MiladRahimi\PhpCrypt\Symmetric;
 
 $data = json_decode(file_get_contents('php://input'), true);
 
-if(!isset($data['algoritma']) || !isset($data['action']) || !isset($data['text'])) {
-    echo "Data tidak lengkap";
+if (!isset($data['algoritma']) || !isset($data['action']) || !isset($data['text'])) {
+    printf(json_encode([
+        'error' => 'Invalid request'
+    ]));
     exit;
+}
+
+$symmetric = new Symmetric();
+
+
+if (!in_array($data['algoritma'], $symmetric->supportedMethods())) {
+    return printf(json_encode([
+        'error' => 'Algoritma tidak didukung'
+    ]));
 }
 
 $algorithm = $data['algoritma'];
 $action = $data['action'];
 $text = $data['text'];
-
-// first vector
-$iv = "1234567890123456";
-
-$key = "";
-switch ($algorithm) {
-    case 'AES128':
-        $key = "1234567890123456";
-        break;
-    case 'AES192':
-        $key = "123456789012345678901234";
-        break;
-    case 'AES256':
-        $key = "12345678901234567890123456789012";
-        break;
-    default:
-        $key = "1234567890123456";
-        break;
-    break;
-}
+$key = '1234567890123456789012';
 
 
-// AES CBC
-$aes = new Aes($key, 'CBC', $iv);
+if ($action == 'encrypt') {
+    try {
+        $symmetric->setKey($key);
+        $symmetric->setMethod($algorithm);
 
-if($action == 'encrypt') {
+        $result = $symmetric->encrypt($text);
 
-    // encrypt
-    $result = $aes->encrypt($text);
+        // convert to hex
+        $result = bin2hex($result);
 
-    // convert to hex
-    $result = bin2hex($result);
-    
-    // print result
-    return printf(json_encode(array('result' => $result)));
+        // print result
+        return printf(json_encode(array('result' => $result)));
+    } catch (\Throwable $th) {
+        return printf(json_encode(array('error' => $th->getMessage())));
+    }
 } else {
-    // convert to binary
-    $text = hex2bin($text);
+    try {
+        $symmetric->setKey($key);
+        $symmetric->setMethod($algorithm);
 
-    // decrypt
-    $result = $aes->decrypt($text);
+        // convert from hex
+        $text = hex2bin($text);
 
-    // print result
-    return printf(json_encode(array('result' => $result)));
+        // decrypt
+        $result = $symmetric->decrypt($text);
+
+        // print result
+        return printf(json_encode(array('result' => $result)));
+    } catch (\Throwable $th) {
+        return printf(json_encode(array('error' => $th->getMessage())));
+    }
 }
